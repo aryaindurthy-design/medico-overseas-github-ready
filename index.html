@@ -1,11 +1,14 @@
  <!DOCTYPE html>
 <html lang="en">
-<head>
- <script>
-  if (sessionStorage.getItem("medicoAccess") !== "true") {
+<head><script>
+  if (
+    localStorage.getItem("medicoLoggedIn") !== "true" &&
+    localStorage.getItem("medicoLoginSkipped") !== "true"
+  ) {
     window.location.replace("login.html");
   }
-</script><style>
+</script>
+<style>
 #loader-screen {
   position: fixed;
   inset: 0;
