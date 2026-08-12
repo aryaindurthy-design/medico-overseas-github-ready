@@ -303,7 +303,7 @@
 
   <script>
  function skipLogin() {
-  localStorage.setItem("medicoLoginSkipped", "true");
+  sessionStorage.setItem("medicoLoginSkipped", "true");
 
   sessionStorage.setItem("showHeartbeatLoader", "true");
 
@@ -336,7 +336,7 @@
         const data = await response.json();
 
          if (response.ok) {
-    localStorage.setItem("medicoLoggedIn", "true");
+    sessionStorage.setItem("medicoLoggedIn", "true");
     localStorage.setItem("medicoUser", JSON.stringify(data.user));
     localStorage.setItem("medicoLoginSkipped", "true");
 
