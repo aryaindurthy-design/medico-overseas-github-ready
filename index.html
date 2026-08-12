@@ -1,6 +1,11 @@
  <!DOCTYPE html>
 <html lang="en">
-<head><style>
+<head>
+ <script>
+  if (sessionStorage.getItem("medicoAccess") !== "true") {
+    window.location.replace("login.html");
+  }
+</script><style>
 #loader-screen {
   position: fixed;
   inset: 0;
