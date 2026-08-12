@@ -335,16 +335,15 @@
 
         const data = await response.json();
 
-         if (response.ok) {
+if (response.ok) {
     sessionStorage.setItem("medicoLoggedIn", "true");
     localStorage.setItem("medicoUser", JSON.stringify(data.user));
-    localStorage.setItem("medicoLoginSkipped", "true");
 
     sessionStorage.setItem("showHeartbeatLoader", "true");
 
     window.location.href = "index.html";
-
-    } else {
+}
+else {
       message.textContent = data.message || "Login failed.";
     }
 
