@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Medico Overseas</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #eef5ff, #dceaff);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: #1F3864;
+      font-size: 28px;
+    }
+
+    .brand p {
+      margin-top: 6px;
+      color: #666;
+    }
+
+  .cloud {
+  position: relative;
+  width: 240px;
+  height: 135px;
+  margin: 0 auto 20px;
+  overflow: visible;
+}
+
+.cloud img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Animated eyes */
+.cloud-eye {
+  position: absolute;
+  top: 48%;
+  width: 18px;
+  height: 26px;
+  background: #1F3864;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    height 0.18s ease,
+    border-radius 0.18s ease,
+    transform 0.12s ease;
+  z-index: 5;
+}
+
+/* Left eye */
+.cloud-eye.left {
+  left: 43%;
+}
+
+/* Right eye */
+.cloud-eye.right {
+  left: 57%;
+}
+
+/* Tiny white shine */
+.cloud-eye::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%;
+  top: 5px;
+  left: 4px;
+}
+
+/* Blinking */
+.cloud-eye.blink {
+  height: 4px;
+  border-radius: 5px;
+}
+
+.cloud-eye.blink::after {
+  display: none;
+}
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d5dbe5;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #1F3864;
+      box-shadow: 0 0 0 3px rgba(31,56,100,0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      border: none;
+      padding: 14px;
+      margin-top: 5px;
+      border-radius: 10px;
+      background: #1F3864;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background: #162b4d;
+    }
+
+    .skip-btn {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      color: #1F3864;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .skip-btn:hover {
+      text-decoration: underline;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+
+    <div class="brand">
+      <h1>Medico Overseas</h1>
+      <p>Welcome back</p>
+    </div>
+
+  <div class="cloud" id="cloudMascot">
+
+  <img
+    src="https://pub-940ccf6255b54fa799a9b01050e6c227.r2.dev/cloud.jpg"
+    alt="Medico mascot"
+  >
+
+  <div class="cloud-eye left"></div>
+  <div class="cloud-eye right"></div>
+
+</div>
+    <form id="loginForm">
+
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+          required
+          onfocus="startEyeClose()"
+          onblur="stopEyeClose()"
+        >
+      </div>
+
+      <button type="submit" class="login-btn">
+        Login
+      </button>
+
+    </form>
+
+    <button class="skip-btn" onclick="skipLogin()">
+      Skip → Continue to Medico Overseas
+    </button>
+    <button
+  type="button"
+  class="skip-btn"
+  onclick="showRegister()"
+>
+  Create a new account
+</button>
+
+    <div id="message" class="message"></div>
+    <div id="registerForm" style="display: none; width: 100%;">
+
+  <h3 style="text-align: center; color: #1F3864; margin-bottom: 15px;">
+    Create Account
+  </h3>
+
+  <div class="form-group">
+    <label>Name</label>
+    <input
+      type="text"
+      id="registerName"
+      placeholder="Your Name"
+    >
+  </div>
+
+  <div class="form-group">
+    <label>Email</label>
+    <input
+      type="email"
+      id="registerEmail"
+      placeholder="Your Email"
+    >
+  </div>
+
+  <div class="form-group">
+    <label>Username</label>
+    <input
+      type="text"
+      id="registerUsername"
+      placeholder="Username"
+    >
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <input
+      type="password"
+      id="registerPassword"
+      placeholder="Password"
+    >
+  </div>
+
+  <button
+    type="button"
+    class="login-btn"
+    onclick="registerUser()"
+  >
+    Create Account
+  </button>
+
+  <button
+    type="button"
+    class="skip-btn"
+    onclick="showLogin()"
+  >
+    ← Back to Login
+  </button>
+
+</div>
+
+  </div>
+
+  <script>
+ function skipLogin() {
+  localStorage.setItem("medicoLoginSkipped", "true");
+
+  sessionStorage.setItem("showHeartbeatLoader", "true");
+
+  window.location.href = "index.html";
+}
+
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+      message.textContent = "Logging in...";
+
+      try {
+        
+        const response = await fetch("http://localhost:3001/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+
+        const data = await response.json();
+
+          if (response.ok) {
+     localStorage.setItem("medicoLoggedIn", "true");
+localStorage.setItem("medicoUser", JSON.stringify(data.user));
+
+sessionStorage.setItem("showHeartbeatLoader", "true");
+
+window.location.href = "index.html";
+    } else {
+      message.textContent = data.message || "Login failed.";
+    }
+
+  } catch (error) {
+    console.error("Error during login:", error);
+    message.textContent = "An error occurred. Please try again.";
+  }
+});
+function showRegister() {
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("registerForm").style.display = "block";
+  document.getElementById("message").textContent = "";
+}
+
+function showLogin() {
+  document.getElementById("registerForm").style.display = "none";
+  document.getElementById("loginForm").style.display = "block";
+  document.getElementById("message").textContent = "";
+}
+
+async function registerUser() {
+  const name = document.getElementById("registerName").value.trim();
+  const email = document.getElementById("registerEmail").value.trim();
+  const username = document.getElementById("registerUsername").value.trim();
+  const password = document.getElementById("registerPassword").value;
+
+  const message = document.getElementById("message");
+
+  if (!name || !email || !username || !password) {
+    message.textContent = "Please fill in all fields.";
+    return;
+  }
+
+  if (password.length < 6) {
+    message.textContent = "Password must be at least 6 characters.";
+    return;
+  }
+
+  message.textContent = "Creating account...";
+
+  try {
+    const response = await fetch("http://localhost:3001/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        username,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      message.textContent = "Account created! You can now login.";
+
+      document.getElementById("registerForm").style.display = "none";
+      document.getElementById("loginForm").style.display = "block";
+
+      document.getElementById("email").value = email;
+    } else {
+      message.textContent = data.message || "Registration failed.";
+    }
+
+  } catch (error) {
+    console.error(error);
+    message.textContent = "Unable to connect to server.";
+  }
+}
+const eyes = document.querySelectorAll(".cloud-eye");
+const cloud = document.getElementById("cloudMascot");
+
+let passwordFocused = false;
+
+/* Password focus = close eyes */
+function startEyeClose() {
+  passwordFocused = true;
+
+  eyes.forEach(eye => {
+    eye.classList.add("blink");
+  });
+}
+
+/* Password blur = open eyes */
+function stopEyeClose() {
+  passwordFocused = false;
+
+  eyes.forEach(eye => {
+    eye.classList.remove("blink");
+  });
+}
+
+
+/* Eyes follow mouse */
+document.addEventListener("mousemove", function(event) {
+
+  if (passwordFocused) return;
+
+  const rect = cloud.getBoundingClientRect();
+
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+
+  let moveX = (mouseX - centerX) / 25;
+  let moveY = (mouseY - centerY) / 25;
+
+  /* Limit eye movement */
+  moveX = Math.max(-5, Math.min(5, moveX));
+  moveY = Math.max(-5, Math.min(5, moveY));
+
+  eyes.forEach(eye => {
+    eye.style.transform =
+      `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+  });
+});
+
+
+/* Automatic blinking */
+function blinkEyes() {
+
+  if (passwordFocused) return;
+
+  eyes.forEach(eye => {
+    eye.classList.add("blink");
+  });
+
+  setTimeout(() => {
+
+    if (!passwordFocused) {
+      eyes.forEach(eye => {
+        eye.classList.remove("blink");
+      });
+    }
+
+  }, 180);
+}
+
+
+/* Blink every few seconds */
+setInterval(() => {
+
+  if (!passwordFocused) {
+    blinkEyes();
+  }
+
+}, 3500);
+  </script>
+
+</body>
+</html>

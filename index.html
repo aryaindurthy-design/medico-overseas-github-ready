@@ -1,0 +1,1143 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head><style>
+#loader-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  z-index: 99999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#loader-screen.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.heartbeat-container {
+  width: min(500px, 82vw);
+  text-align: center;
+}
+
+.heartbeat-title {
+  margin-bottom: 18px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #1F3864;
+}
+
+.ecg-wrapper {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  overflow: hidden;
+}
+
+.heartbeat-svg {
+  width: 100%;
+  height: 90px;
+}
+
+.ecg-track {
+  fill: none;
+  stroke: #e5e9ef;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ecg-line {
+  fill: none;
+  stroke: #ff3b30;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(255, 59, 48, 0.45));
+  stroke-dasharray: 55 500;
+  stroke-dashoffset: 555;
+  animation: ecgMove 2.2s linear infinite;
+}
+
+@keyframes ecgMove {
+  from {
+    stroke-dashoffset: 555;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.heartbeat-pulse {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #ff3b30;
+  border-radius: 50%;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 8px rgba(255, 59, 48, 0.7),
+    0 0 18px rgba(255, 59, 48, 0.35);
+  animation: pulseMove 2.2s linear infinite;
+}
+
+@keyframes pulseMove {
+  from {
+    left: 0%;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  95% {
+    opacity: 1;
+  }
+
+  to {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.heartbeat-loading {
+  margin-top: 12px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #7b8491;
+  letter-spacing: 1px;
+}
+
+.heartbeat-loading span {
+  display: inline-block;
+  animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+  0% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.25;
+  }
+}
+</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Medico Overseas | MBBS Abroad Consultancy for Indian Students</title>
+<meta content="Explore MBBS abroad destinations, eligibility, university options, admission support and licensing exam guidance with Medico Overseas." name="description"/>
+<meta content="#1F3864" name="theme-color"/>
+<!-- Tailwind CSS Play CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Lucide Icons Script -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="assets/styles.css" rel="stylesheet"/>
+<style>
+    /* Solid blue background for the top information bar */
+    .global-head-top {
+      background: linear-gradient(90deg, #123b6c 0%, #1f4f8b 100%);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 0 0 16px 16px;
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 0px; 
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Helps space out the main navigation bar */
+    .global-nav-inner {
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;
+      padding: 15px 0;
+    }
+
+    /* Controls the logo size in the bottom bar and ensures it stays put */
+    .global-brand {
+      display: flex;
+      align-items: center;
+    }
+    
+    .global-brand img {
+      max-height: 65px; 
+      width: auto;
+    }
+
+    /* --- CARD-RELATIVE LOCALIZED SPOTLIGHT GLOW EFFECT --- */
+    .spotlight-glow-card {
+      --base: 210;
+      --spread: 250;
+      --radius: 16;
+      --border: 2;
+      --size: 320;
+      --outer: 1;
+      --border-size: calc(var(--border, 2) * 1px);
+      --spotlight-size: calc(var(--size, 320) * 1px);
+      --hue: calc(var(--base) + (var(--xp, 0) * var(--spread, 0)));
+      
+      position: relative;
+      touch-action: none;
+      background-image: radial-gradient(
+        var(--spotlight-size) var(--spotlight-size) at
+        calc(var(--x, 0) * 1px)
+        calc(var(--y, 0) * 1px),
+        hsl(var(--hue, 210) 100% 60% / 0.35), transparent 70%
+      );
+      background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+      background-position: 50% 50%;
+    }
+
+    .spotlight-glow-card::before,
+    .spotlight-glow-card::after {
+      pointer-events: none;
+      content: "";
+      position: absolute;
+      inset: calc(var(--border-size) * -1);
+      border: var(--border-size) solid transparent;
+      border-radius: calc(var(--radius) * 1px);
+      background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+      mask-clip: padding-box, border-box;
+      mask-composite: intersect;
+      z-index: 3;
+    }
+    
+    .spotlight-glow-card::before {
+      background-image: radial-gradient(
+        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
+        calc(var(--x, 0) * 1px)
+        calc(var(--y, 0) * 1px),
+        hsl(var(--hue, 210) 100% 50% / 1), transparent 100%
+      );
+      filter: brightness(2.5) contrast(1.5);
+    }
+    
+    .spotlight-glow-card::after {
+      background-image: radial-gradient(
+        calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
+        calc(var(--x, 0) * 1px)
+        calc(var(--y, 0) * 1px),
+        hsl(0 100% 100% / 0.9), transparent 100%
+      );
+    }
+
+    /* Color variant mappings for individual cards */
+    .card-blue { --base: 220; --spread: 200; }
+    .card-purple { --base: 280; --spread: 300; }
+    .card-green { --base: 120; --spread: 200; }
+    .card-orange { --base: 30; --spread: 200; }
+    .card-red { --base: 0; --spread: 200; }
+
+    /* Styling overlay for destination cards to display background photos clearly */
+    .country-cover {
+      background-size: cover !important;
+      background-position: center !important;
+      position: relative;
+    }
+    .country-cover::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(31,56,100,0.7) 100%);
+      z-index: 1;
+    }
+    .country-cover > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Admission Process Step Cards - Forced into 1 Clean Single Line Layout */
+    .premium-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .premium-steps {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+    }
+
+    .premium-steps .step {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 0 0 15px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-image-wrapper {
+      width: 100%;
+      height: 110px;
+      overflow: hidden;
+    }
+
+    .step-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .premium-steps .step:hover .step-image-wrapper img {
+      transform: scale(1.05);
+    }
+
+    .premium-steps .step .n {
+      display: inline-block;
+      background: #1F3864;
+      color: white;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      border-radius: 50%;
+      margin: 10px auto 6px auto;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    .premium-steps .step h3 {
+      margin: 2px 8px 6px;
+      font-size: 0.95rem;
+      color: #1F3864;
+    }
+
+    .premium-steps .step p {
+      margin: 0 8px;
+      font-size: 0.78rem;
+      color: #555;
+      line-height: 1.25;
+    }
+
+    /* --- TOP ENQUIRE BUTTON STYLES (size adjusted; animation kept) --- */
+    .crazy-enquire-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 12px;
+      overflow: hidden;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #ffffff;
+      background-color: #1F3864;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(31, 56, 100, 0.22);
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      height: auto;
+      min-height: 38px;
+      min-width: 120px;
+      max-width: 160px;
+    }
+
+    .crazy-enquire-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 18px rgba(14, 165, 233, 0.28);
+    }
+
+    .crazy-enquire-btn .sweep-bg-1 {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 160px;
+      height: 160px;
+      transform: translateX(-100%) translateY(100%) rotate(-40deg);
+      background: #0ea5e9;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+    }
+
+    .crazy-enquire-btn .sweep-bg-2 {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 90px;
+      height: 90px;
+      transform: translateX(100%) translateY(-100%) rotate(45deg);
+      background: #3b82f6;
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+    }
+
+    .crazy-enquire-btn:hover .sweep-bg-1 {
+      transform: translateX(0) translateY(20px) rotate(-40deg);
+      margin-left: 0;
+    }
+
+    .crazy-enquire-btn:hover .sweep-bg-2 {
+      transform: translateX(0) translateY(0) rotate(45deg);
+    }
+
+    .crazy-enquire-btn svg,
+    .crazy-enquire-btn span {
+      position: relative;
+      z-index: 2;
+      transition: color 0.3s ease-in-out;
+    }
+
+    .crazy-enquire-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .crazy-enquire-btn:hover span,
+    .crazy-enquire-btn:hover svg {
+      color: #000000 !important;
+      fill: #000000 !important;
+    }
+
+    /* --- MODERN LIQUID SHINE ANIMATION FOR HERO COUNSELLING BUTTON --- */
+    .modern-hero-counselling {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #FF5722 0%, #F4511E 100%) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      box-shadow: 0 10px 25px -5px rgba(255, 87, 34, 0.4);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .modern-hero-counselling::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+      );
+      transform: skewX(-20deg);
+      transition: none;
+    }
+
+    .modern-hero-counselling:hover::after {
+      left: 150%;
+      transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modern-hero-counselling:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 30px -5px rgba(255, 87, 34, 0.4);
+    }
+
+    .modern-hero-counselling span {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modern-hero-counselling:hover span {
+      transform: translateX(6px);
+    }
+
+    /* Additional custom styling for top support banner elements */
+    .top-support-message {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #f8fbff;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 2;
+    }
+    .top-svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+    .top-contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: #f8fbff !important;
+      font-weight: 600;
+      opacity: 1;
+      position: relative;
+      z-index: 2;
+    }
+    .top-contact-link:hover,
+    .top-contact-link:focus-visible {
+      color: #ffffff !important;
+    }
+    .top-divider {
+      width: 1px;
+      height: 12px;
+      background-color: rgba(255, 255, 255, 0.35);
+      margin: 0 6px;
+      position: relative;
+      z-index: 2;
+    }
+    .support-heart {
+      color: #ff334b;
+    }
+
+    /* --- HEARTBEAT VIDEO BACKGROUND STYLES --- */
+    .heartbeat-video-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.9;
+    }
+
+    .heartbeat-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.95) saturate(1.05);
+    }
+  </style>
+</head>
+<body class="home-page">
+  <div id="loader-screen">
+
+  <div class="heartbeat-container">
+
+    <div class="heartbeat-title">
+      MEDICO OVERSEAS
+    </div>
+
+    <div class="ecg-wrapper">
+
+      <svg
+        class="heartbeat-svg"
+        viewBox="0 0 300 80"
+        preserveAspectRatio="none"
+      >
+
+        <path
+          class="ecg-track"
+          d="
+            M0 40
+            L70 40
+            L82 40
+            L88 34
+            L94 40
+            L103 40
+            L110 8
+            L118 68
+            L126 40
+            L145 40
+            L152 33
+            L159 40
+            L300 40
+          "
+        />
+
+        <path
+          class="ecg-line"
+          d="
+            M0 40
+            L70 40
+            L82 40
+            L88 34
+            L94 40
+            L103 40
+            L110 8
+            L118 68
+            L126 40
+            L145 40
+            L152 33
+            L159 40
+            L300 40
+          "
+        />
+
+      </svg>
+
+      <div class="heartbeat-pulse"></div>
+
+    </div>
+
+    <div class="heartbeat-loading">
+      Loading<span>...</span>
+    </div>
+
+  </div>
+
+</div>
+<header class="global-header">
+<div class="container global-head-top">
+    <div class="heartbeat-video-container">
+        <video class="heartbeat-video" autoplay loop muted playsinline>
+            <source src="https://pixabay.com/videos/download/video-343438_large.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="top-support-message">
+        <span class="support-shield text-sky-300">
+            <svg aria-hidden="true" class="top-svg top-shield-svg" viewBox="0 0 24 24"><path d="M12 2.8 19 5.6v5.2c0 4.7-2.8 8.7-7 10.4-4.2-1.7-7-5.7-7-10.4V5.6L12 2.8Z"></path><path d="m8.7 11.8 2.1 2.1 4.6-5"></path></svg>
+        </span>
+        <span>We’re here to support your dream of becoming a doctor</span>
+        <span class="support-heart">♥</span>
+    </div>
+    <div class="global-contact" style="display: flex; align-items: center; gap: 10px; position: relative; z-index: 2;">
+        <a class="top-contact-link" href="tel:+919347406969">
+            <span class="top-contact-icon text-sky-300"><svg aria-hidden="true" class="top-svg" viewBox="0 0 24 24"><path d="M7.2 3.5 4.6 4.7c-.8.4-1.1 1.3-.8 2.1 2.2 5.8 6.8 10.4 12.6 12.6.8.3 1.7 0 2.1-.8l1.2-2.6c.4-.8.1-1.7-.7-2.1l-3.2-1.4c-.7-.3-1.6-.1-2 .5l-1 1.3a14.4 14.4 0 0 1-3.1-3.1l1.3-1c.6-.4.8-1.3.5-2L10.1 5c-.4-.8-1.3-1.1-2.1-.7l-.8-.8Z"></path></svg></span>
+            <span>+91 93474 06969</span>
+        </a>
+        <span aria-hidden="true" class="top-divider"></span>
+        <a class="top-contact-link" href="mailto:info@medicooverseas.com">
+            <span class="top-contact-icon text-sky-300"><svg aria-hidden="true" class="top-svg" viewBox="0 0 24 24"><rect height="14" rx="1.7" width="18" x="3" y="5"></rect><path d="m4 7 8 6 8-6"></path></svg></span>
+            <span>info@medicooverseas.com</span>
+        </a>
+    </div>
+    <button aria-expanded="false" aria-label="Open navigation" class="menu-btn" data-menu="">☰</button>
+</div>
+<div class="global-nav-row">
+<div class="container global-nav-inner">
+<a aria-label="Medico Overseas home" class="brand global-brand" href="./"><img alt="Medico Overseas logo" src="assets/logo.png"/></a>
+<nav aria-label="Main navigation" class="nav-links global-nav" data-nav="">
+<a class="active" href="./">Home</a>
+<a href="about/">About Us</a>
+<div class="nav-item has-dropdown"><a href="#">Countries <span>⌄</span></a><div class="dropdown">
+<a href="destinations/mbbs-in-russia/">MBBS in Russia</a><a href="destinations/mbbs-in-georgia/">MBBS in Georgia</a><a href="destinations/mbbs-in-kyrgyzstan/">MBBS in Kyrgyzstan</a><a href="destinations/mbbs-in-uzbekistan/">MBBS in Uzbekistan</a><a href="destinations/mbbs-in-armenia/">MBBS in Armenia</a><a href="destinations/mbbs-in-vietnam/">MBBS in Vietnam</a>
+</div></div>
+<div class="nav-item has-dropdown"><a href="#">Exams <span>⌄</span></a><div class="dropdown"><a href="exams/fmge/">FMGE Exam</a><a href="exams/nmat/">NMAT Exam</a></div></div>
+<a href="blogs/">Blogs</a><a href="contact/">Contact Us</a>
+</nav>
+
+<!-- Top Enquire button (unified with About page) -->
+<a class="btn btn-primary global-enquire enquire-motion-v4" data-whatsapp-cta="" href="#enquiry">
+  <span class="enquire-panels" aria-hidden="true"><i class="enquire-shape shape-cyan-left"></i><i class="enquire-shape shape-navy-wedge"></i><i class="enquire-shape shape-cyan-right"></i></span>
+  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.08 0C5.52 0 .18 5.33.18 11.88c0 2.1.55 4.16 1.6 5.97L.08 24l6.3-1.65a11.9 11.9 0 0 0 5.7 1.45h.01C18.65 23.8 24 18.47 24 11.91c0-3.18-1.24-6.16-3.5-8.41Zm-8.42 18.3a9.88 9.88 0 0 1-5.04-1.38l-.36-.22-3.74.98 1-3.64-.24-.37a9.86 9.86 0 0 1-1.51-5.29c0-5.45 4.44-9.88 9.9-9.88a9.8 9.8 0 0 1 7 2.9 9.82 9.82 0 0 1 2.9 7.01c0 5.45-4.45 9.89-9.91 9.89Zm5.42-7.41c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48a9.02 9.02 0 0 1-1.66-2.06c-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/></svg>
+  <span>Enquire Now</span>
+</a>
+
+</div>
+</div>
+</header>
+<main>
+
+<!-- UNIFIED HERO SECTION WITH ONE SEAMLESS LIGHT BLUE TRANSPARENT BACKGROUND CONTAINER -->
+<section class="relative w-full min-h-[580px] bg-gradient-to-b from-sky-50/70 via-white to-blue-50/40 overflow-hidden flex items-center py-16 px-4 sm:px-6 lg:px-8">
+  
+  <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10 p-8 sm:p-12 rounded-3xl bg-sky-100/30 border border-sky-200/50 shadow-sm backdrop-blur-md overflow-hidden" style="background-image:linear-gradient(rgba(232,245,255,0.72),rgba(232,245,255,0.72)),url('assets/mbbs-globe-bg.png');background-size:cover;background-position:center;background-repeat:no-repeat;">
+    
+    <div class="text-left">
+      <p class="text-blue-600 font-semibold tracking-wide uppercase text-sm mb-2">Your Trusted Path to a</p>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-slate-900 mb-6 leading-tight">
+        World-Class <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">MBBS Degree Abroad</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-600 mb-8 leading-relaxed">
+        Study in recognized medical universities abroad with clear guidance on eligibility, fees, documentation and licensing requirements.
+      </p>
+      <div class="flex flex-wrap gap-4 screenshot-actions">
+        <a class="btn btn-primary btn-lg modern-hero-counselling" href="#enquiry">Get Free Counselling <span>→</span></a>
+        <a class="btn btn-outline btn-lg bg-white text-slate-700 border-slate-300 hover:bg-slate-50" href="#destinations">Explore Countries</a>
+      </div>
+    </div>
+
+    <div 
+      id="hero-carousel"
+      class="relative w-full h-[480px] flex items-center justify-center cursor-pointer perspective-[1200px]"
+    >
+      <div id="cards-container" class="relative w-full h-full flex items-center justify-center" style="transform-style: preserve-3d;">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Trust Bar -->
+<div class="container screenshot-trust-wrap py-6">
+  <div class="screenshot-trustbar flex flex-wrap justify-around bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+    <div class="shot-stat flex items-center gap-3"><span class="shot-icon text-blue-600 font-bold text-xl">✓</span><div><strong>Verified</strong><small class="block text-slate-500">Admission Guidance</small></div></div>
+    <div class="shot-stat flex items-center gap-3"><span class="shot-icon text-blue-600 font-bold text-xl">◎</span><div><strong>6</strong><small class="block text-slate-500">Study Destinations</small></div></div>
+    <div class="shot-stat flex items-center gap-3"><span class="shot-icon text-blue-600 font-bold text-xl">▦</span><div><strong>Clear</strong><small class="block text-slate-500">University Comparison</small></div></div>
+    <div class="shot-stat flex items-center gap-3"><span class="shot-icon text-blue-600 font-bold text-xl">↗</span><div><strong>End-to-End</strong><small class="block text-slate-500">Application Support</small></div></div>
+  </div>
+</div>
+
+<section class="screenshot-why" id="universities">
+<div class="container">
+<div class="screenshot-title"><h2>Why Study <span>MBBS Abroad?</span></h2><i>icon</i></div>
+<div class="screenshot-benefits">
+<article><span>♧</span><strong>NMC / WHO</strong><small>Recognized Universities</small></article>
+<article><span>▣</span><strong>Affordable Fees &amp;</strong><small>Low Cost of Living</small></article>
+<article><span>◇</span><strong>High Quality</strong><small>Education</small></article>
+<article><span>✓</span><strong>Safe &amp; Student</strong><small>Friendly Countries</small></article>
+<article><span>♬</span><strong>Complete Support</strong><small>From Admission to Visa</small></article>
+</div>
+</div>
+</section>
+
+<!-- EXPLORE MBBS OPTIONS WITH SPOTLIGHT EFFECT -->
+<section class="destinations-section section-soft" id="destinations">
+<div class="container">
+<div class="section-head split-head">
+<div><div class="kicker">Study destinations</div><h2>Explore your MBBS options</h2></div>
+<p>Each destination page covers eligibility, universities, indicative fee structure, documents, visa, student life and country-specific FAQs.</p>
+</div>
+<div class="country-grid premium-country-grid">
+  <a class="country-card premium-country spotlight-glow-card card-blue" href="destinations/mbbs-in-russia/index.html"><div class="country-cover" style="background-image: url('https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&w=800&q=80');"><span class="flag">🇷🇺</span><span class="country-index">01</span></div><div class="body"><h3>MBBS in Russia</h3><p>Eligibility, universities, fees, admission process, visa and student life.</p><span class="learn-link">Explore Russia →</span></div></a>
+  <a class="country-card premium-country spotlight-glow-card card-purple" href="destinations/mbbs-in-georgia/index.html"><div class="country-cover" style="background-image: url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80');"><span class="flag">🇬🇪</span><span class="country-index">02</span></div><div class="body"><h3>MBBS in Georgia</h3><p>Eligibility, universities, fees, admission process, visa and student life.</p><span class="learn-link">Explore Georgia →</span></div></a>
+  <a class="country-card premium-country spotlight-glow-card card-green" href="destinations/mbbs-in-kyrgyzstan/index.html"><div class="country-cover" style="background-image: url('https://www.shutterstock.com/shutterstock/videos/4088945005/thumb/1.jpg?ip=x480');"><span class="flag">🇰🇬</span><span class="country-index">03</span></div><div class="body"><h3>MBBS in Kyrgyzstan</h3><p>Osh State, JASU &amp; ASMI. Top English-medium programs with NMC &amp; WHO recognition.</p><span class="learn-link">Explore Kyrgyzstan →</span></div></a>
+  <a class="country-card premium-country spotlight-glow-card card-orange" href="destinations/mbbs-in-uzbekistan/index.html"><div class="country-cover" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80');"><span class="flag">🇺🇿</span><span class="country-index">04</span></div><div class="body"><h3>MBBS in Uzbekistan</h3><p>Eligibility, universities, fees, admission process, visa and student life.</p><span class="learn-link">Explore Uzbekistan →</span></div></a>
+  <a class="country-card premium-country spotlight-glow-card card-red" href="destinations/mbbs-in-armenia/index.html"><div class="country-cover" style="background-image: url('https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=800&q=80');"><span class="flag">🇦🇲</span><span class="country-index">05</span></div><div class="body"><h3>MBBS in Armenia</h3><p>Eligibility, universities, fees, admission process, visa and student life.</p><span class="learn-link">Explore Armenia →</span></div></a>
+  <a class="country-card premium-country spotlight-glow-card card-blue" href="destinations/mbbs-in-vietnam/index.html"><div class="country-cover" style="background-image: url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80');"><span class="flag">🇻🇳</span><span class="country-index">06</span></div><div class="body"><h3>MBBS in Vietnam</h3><p>VinUniversity, HMU &amp; CTUMP. World-class medical simulation and training labs.</p><span class="learn-link">Explore Vietnam →</span></div></a>
+</div>
+</div>
+</section>
+
+<!-- ADMISSION PROCESS STEPS WITH SPOTLIGHT EFFECT ADDED -->
+<section class="process-section">
+<div class="container">
+<div class="section-head centered-head"><div class="kicker">Admission process</div><h2>From first conversation to <span>departure</span></h2><p>A simple, transparent five-step journey for students and parents.</p></div>
+<div class="steps premium-steps">
+  
+<!-- Step 1 -->
+<div class="step spotlight-glow-card card-blue">
+  <div class="step-image-wrapper">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk3j5SQEbWdS8zDPU_GXVOePN3dJuy24XQTv5CIcMfepqbSEe8BQG4Afs&s=10" alt="Consultation"/>
+  </div>
+  <div class="n">1</div>
+  <h3>Consultation</h3>
+  <p>Review academics, NEET, budget and country preferences.</p>
+</div>
+
+<!-- Step 2 -->
+<div class="step spotlight-glow-card card-purple">
+  <div class="step-image-wrapper">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZfJLvfx7f9IHuDelr6Cv6t-g3HQoAlmt2xemqkCa8piYVkeHqJojE45pQ&s=10" alt="Documentation"/>
+  </div>
+  <div class="n">2</div>
+  <h3>Documentation</h3>
+  <p>Prepare academic and identity records for application.</p>
+</div>
+
+<!-- Step 3 -->
+<div class="step spotlight-glow-card card-green">
+  <div class="step-image-wrapper">
+    <img src="https://img.magnific.com/free-photo/low-angle-cheerful-team-students-passed-test-by-preparing-all-together_496169-2336.jpg?semt=ais_hybrid&w=740&q=80" alt="University Selection"/>
+  </div>
+  <div class="n">3</div>
+  <h3>University Selection</h3>
+  <p>Compare recognition, fees, course structure and hostel support.</p>
+</div>
+
+<!-- Step 4 -->
+<div class="step spotlight-glow-card card-orange">
+  <div class="step-image-wrapper">
+    <img src="https://static.toiimg.com/photo/62192417.cms" alt="Visa Applications"/>
+  </div>
+  <div class="n">4</div>
+  <h3>Visa Applications</h3>
+  <p>Submit and track visa applications with guidance.</p>
+</div>
+
+<!-- Step 5 -->
+<div class="step spotlight-glow-card card-red">
+  <div class="step-image-wrapper">
+    <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="Departure"/>
+  </div>
+  <div class="n">5</div>
+  <h3>Departure</h3>
+  <p>Pre-departure guidance and travel coordination.</p>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="exam-feature section-soft" id="exams">
+<div class="container exam-feature-grid">
+<div class="section-head"><div class="kicker">Beyond admission</div><h2>Plan the licensing pathway early</h2><p>Medico Overseas is positioned as a full-journey partner. Students can access information about the FMGE/NExT pathway and exam preparation planning alongside admission guidance.</p><a class="btn btn-primary" href="exams/fmge/index.html">Explore FMGE Guidance →</a></div>
+<div class="exam-stack">
+<a class="exam-feature-card" href="exams/fmge/index.html"><span class="exam-label">FMGE / NExT</span><h3>Foreign medical graduate pathway</h3><p>Eligibility, registration process, exam pattern, syllabus overview, preparation guidance and FAQs.</p><span>View exam guide →</span></a>
+<a class="exam-feature-card muted-exam" href="exams/nmat/index.html"><span class="exam-label">NMAT</span><h3>Exam information</h3><p>Dedicated page included; exact NMAT context should be confirmed before final publishing.</p><span>View NMAT page →</span></a>
+</div>
+</div>
+</section>
+<section class="blog-preview">
+<div class="container">
+<div class="section-head split-head"><div><div class="kicker">Knowledge centre</div><h2>Guides for smarter decisions</h2></div><a class="text-link" href="blogs/index.html">View all blogs →</a></div>
+<div class="blog-grid premium-blog-grid">
+  <article class="blog-card premium-blog spotlight-glow-card card-blue">
+  <div class="blog-img blog-art art-one" style="background-image: url('https://learn.hms.harvard.edu/sites/default/files/2025-01/7.22.24_incorporatingcriticalthinkingskills.jpg'); background-size: cover; background-position: center;">
+    <span>Recognition</span>
+  </div>
+  <div class="body">
+    <span class="tag">General</span>
+    <h3>How to compare MBBS abroad universities safely</h3>
+    <p>Recognition, course structure, clinical training, fees and licensing should all be checked.</p>
+  </div>
+</article>
+
+<article class="blog-card premium-blog spotlight-glow-card card-purple">
+  <div class="blog-img blog-art art-two" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXzXBjHyyxvMX6w1wDRWZnxaIzz0pVDTvuL9TMrZR7XokPLQXQbu8UCfWH&s=10'); background-size: cover; background-position: center;">
+    <span>FMGE</span>
+  </div>
+  <div class="body">
+    <span class="tag">Exam</span>
+    <h3>FMGE preparation: why planning early matters</h3>
+    <p>Connect university learning with structured MCQ practice and revision planning.</p>
+  </div>
+</article>
+
+<article class="blog-card premium-blog spotlight-glow-card card-green">
+  <div class="blog-img blog-art art-three" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWranua8fqIG3hft_3rZCKy1Dija4H5z35J-BsndGsP8OQTCmgm0kBmbo&s=10'); background-size: cover; background-position: center;">
+    <span>Documents</span>
+  </div>
+  <div class="body">
+    <span class="tag">Admissions</span>
+    <h3>MBBS abroad document checklist</h3>
+    <p>Prepare passport, academic, eligibility and university records consistently.</p>
+  </div>
+</article>
+</div>
+</div>
+</section>
+<section class="home-gallery section-soft" id="gallery">
+<div class="container">
+<div class="section-head centered-head"><div class="kicker">Student experience</div><h2>Campus, Hostel &amp; Student Life</h2><p>A clear visual view of where students study, live and build their medical journey. Replace these placeholders with approved real student and campus photos before launch.</p></div>
+<div class="gallery-grid">
+<style>
+  .gallery-grid {
+    display: flex;
+    gap: 16px;
+  }
+  .gallery-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gallery-card img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+
+<div class="gallery-grid">
+  <div class="gallery-card spotlight-glow-card card-blue" style="padding: 12px; border-radius: 12px; background: #ffffff;">
+    <img src="https://tinyurl.com/4cp7zvzr" alt="Campus Life" style="border-radius: 8px;">
+    <p style="margin-top: 8px; font-weight: 600; color: #1F3864;">Campus Life</p>
+  </div>
+  <div class="gallery-card spotlight-glow-card card-orange" style="padding: 12px; border-radius: 12px; background: #ffffff;">
+    <img src="https://tinyurl.com/4kwwfpf2" alt="Hostel & Accommodation" style="border-radius: 8px;">
+    <p style="margin-top: 8px; font-weight: 600; color: #1F3864;">Hostel & Accommodation</p>
+  </div>
+  <div class="gallery-card spotlight-glow-card card-green" style="padding: 12px; border-radius: 12px; background: #ffffff;">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVUGwQXLIeaNI7gmGuVprE_VvyZZJYpf2pokt4ojtwPw&s=10" alt="Student Community" style="border-radius: 8px;">
+    <p style="margin-top: 8px; font-weight: 600; color: #1F3864;">Student Community</p>
+  </div>
+</div>
+</div>
+</div>
+</section>
+<section class="home-faq" id="faqs">
+<div class="container">
+<div class="section-head centered-head"><div class="kicker">Common questions</div><h2>Frequently Asked Questions</h2></div>
+<div class="faq"><style>
+  .faq-container-custom {
+    max-width: 800px !important;
+    margin: 20px auto !important;
+    font-family: inherit !important;
+  }
+  .faq-container-custom .faq-item {
+    margin-bottom: 12px !important;
+  }
+  .faq-container-custom .faq-q {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 2px solid #ff7518 !important; /* Striking orange border */
+    border-radius: 8px !important;
+    padding: 16px 20px !important;
+    text-align: left !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #222222 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: pointer !important;
+  }
+  .faq-container-custom .faq-q:hover {
+    background-color: #fff5ec !important; /* Light warm orange tint on hover */
+  }
+  .faq-container-custom .plus {
+    font-size: 1.25rem !important;
+    color: #ff7518 !important;
+    font-weight: bold !important;
+  }
+  .faq-container-custom .faq-a {
+    padding: 12px 20px !important;
+    color: #555555 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+  }
+  .faq-container-custom .faq-a p {
+    margin: 0 !important;
+  }
+</style>
+
+<div class="faq-container-custom">
+    <div class="faq-item spotlight-glow-card card-orange" style="border-radius: 12px; padding: 4px; background: #ffffff;">
+        <button class="faq-q" style="border: none !important;">
+            <span>Is NEET required for Indian students planning MBBS abroad?</span>
+            <span class="plus">+</span>
+        </button>
+        <div class="faq-a">
+            <p>Indian students should verify the current NMC eligibility and NEET requirements applicable to their admission year before finalising a university.</p>
+        </div>
+    </div>
+
+    <div class="faq-item spotlight-glow-card card-blue" style="border-radius: 12px; padding: 4px; background: #ffffff;">
+        <button class="faq-q" style="border: none !important;">
+            <span>How do I choose a university?</span>
+            <span class="plus">+</span>
+        </button>
+        <div class="faq-a">
+            <p>Compare recognition status, curriculum, medium of instruction, clinical exposure, fees, hostel, living costs and licensing implications before deciding.</p>
+        </div>
+    </div>
+
+    <div class="faq-item spotlight-glow-card card-purple" style="border-radius: 12px; padding: 4px; background: #ffffff;">
+        <button class="faq-q" style="border: none !important;">
+            <span>Does Medico Overseas help with visa and documentation?</span>
+            <span class="plus">+</span>
+        </button>
+        <div class="faq-a">
+            <p>The website is structured to support the full journey from counselling and documentation through university selection, visa and departure planning.</p>
+        </div>
+    </div>
+
+
+</div>
+</section>
+<section class="home-enquiry" id="enquiry">
+<div class="container">
+<div class="cta-band lead-grid premium-lead spotlight-glow-card card-blue" style="border-radius: 24px; padding: 24px; background: #ffffff;">
+<div class="lead-copy" style="color: #1a202c; font-family: system-ui, -apple-system, sans-serif;">
+  <div class="kicker" style="color: #2563eb; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 6px;">
+    Free counselling
+  </div>
+  
+  <h2 style="color: #0f172a; font-size: 1.75rem; font-weight: 800; line-height: 1.2; margin: 0 0 12px 0;">
+    Check your MBBS abroad eligibility
+  </h2>
+  
+  <p style="color: #334155; font-size: 1rem; line-height: 1.5; margin: 0 0 16px 0;">
+    Share your details and preferred destination. A counsellor can help you compare suitable options and understand the next steps.
+  </p>
+  
+  <div class="lead-support" style="display: flex; flex-wrap: wrap; gap: 12px; font-weight: 500; font-size: 0.9rem; color: #1e293b;">
+    <span style="display: flex; align-items: center; gap: 4px;">✓ Student &amp; parent enquiries</span>
+    <span style="display: flex; align-items: center; gap: 4px;">✓ Country comparison guidance</span>
+    <span style="display: flex; align-items: center; gap: 4px;">✓ Admission &amp; visa pathway</span>
+  </div>
+</div>
+<form id="callbackForm" data-lead-form="">
+<div class="form-title"><strong>Request a callback</strong><small>Fields marked * are required</small></div>
+<div class="form-grid">
+<div class="field"><label>Full name *</label><input name="fullName" placeholder="Student or parent name" required=""/></div>
+<div class="field"><label>Phone / WhatsApp *</label><input name="phone" placeholder="+91" required="" type="tel"/></div>
+<div class="field"><label>Email</label><input name="email" placeholder="you@example.com" type="email"/></div>
+<div class="field"><label>City</label><input name="city" placeholder="Your city"/></div>
+<div class="field"><label>Interested country</label><select name="country"><option>Select a country</option><option>Russia</option><option>Georgia</option><option>Kyrgyzstan</option><option>Uzbekistan</option><option>Armenia</option><option>Vietnam</option></select></div>
+<div class="field"><label>NEET score (optional)</label><input aria-label="NEET score (up to 3 digits)" autocomplete="off" inputmode="numeric" maxlength="3" name="neetScore" pattern="[0-9]{1,3}" placeholder="Enter your NEET score" type="text"/></div>
+<div class="field full"><label>Message (optional)</label><textarea name="message" placeholder="Tell us how we can help"></textarea></div>
+<div class="field full"><button class="btn btn-primary" type="submit">Request a callback →</button></div>
+</div>
+<div class="trust-note">Your details are used only to respond to your admission enquiry.</div><div class="form-msg" id="formMessage"></div>
+</form>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer premium-footer"><div class="container"><div class="footer-grid footer-grid-refined">
+<div class="footer-brand-block"><img alt="Medico Overseas" class="footer-logo" src="assets/logo.png"/><p>Guiding Indian students toward suitable medical universities abroad — from counselling and admission support to licensing-exam awareness.</p><div aria-label="Social media" class="footer-socials footer-socials-icons"><a aria-label="Facebook" data-social-link="facebook" href="#"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M13.7 22v-9h3l.45-3.5H13.7V7.27c0-1.01.28-1.7 1.74-1.7h1.86V2.44c-.32-.04-1.43-.14-2.72-.14-2.69 0-4.53 1.64-4.53 4.65V9.5H7v3.5h3.05v9h3.65Z"></path></svg></a><a aria-label="Instagram" data-social-link="instagram" href="#"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm5.25-3.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"></path></svg></a><a aria-label="Twitter" data-social-link="twitter" href="#"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723 9.99 9.99 0 0 1-3.127 1.195A4.92 4.92 0 0 0 11.78 8.288 13.98 13.98 0 0 1 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096A4.904 4.904 0 0 1 .934 9.12v.06a4.926 4.926 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417A9.867 9.867 0 0 1 1.17 19.611 13.945 13.945 0 0 0 8.671 21.8c9.142 0 14.307-7.721 13.995-14.646A10.025 10.025 0 0 0 24 4.59z"></path></svg></a></div></div>
+<div class="footer-links-col"><h3>Quick Links</h3><a class="quick-link" href=""><span class="footer-mark arrow-mark">›</span>Home</a><a class="quick-link" href="about/"><span class="footer-mark arrow-mark">›</span>About Us</a><a class="quick-link" href="blogs/"><span class="footer-mark arrow-mark">›</span>Blogs</a><a class="quick-link" href="contact/"><span class="footer-mark arrow-mark">›</span>Contact Us</a><a class="quick-link" href="exams/fmge/"><span class="footer-mark arrow-mark">›</span>FMGE Exam</a><a class="quick-link" href="exams/nmat/"><span class="footer-mark arrow-mark">›</span>NMAT Exam</a></div>
+<div class="footer-links-col"><h3>Destinations</h3><a class="destination-link" href="destinations/mbbs-in-russia/"><span class="footer-mark destination-mark">◆</span>MBBS in Russia</a><a class="destination-link" href="destinations/mbbs-in-georgia/"><span class="footer-mark destination-mark">◆</span>MBBS in Georgia</a><a class="destination-link" href="destinations/mbbs-in-kyrgyzstan/"><span class="footer-mark destination-mark">◆</span>MBBS in Kyrgyzstan</a><a class="destination-link" href="destinations/mbbs-in-uzbekistan/"><span class="footer-mark destination-mark">◆</span>MBBS in Uzbekistan</a><a class="destination-link" href="destinations/mbbs-in-armenia/"><span class="footer-mark destination-mark">◆</span>MBBS in Armenia</a><a class="destination-link" href="destinations/mbbs-in-vietnam/"><span class="footer-mark destination-mark">◆</span>MBBS in Vietnam</a></div>
+<div class="footer-contact-col"><h3>Get in touch</h3><a class="contact-info-line" href="tel:+919347406969"><span class="contact-line-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6.6 10.8c1.8 3.5 3.1 4.8 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.8 21 3 13.2 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2Z"></path></svg></span><span>+91 93474 06969</span></a><a class="contact-info-line" href="tel:08632345678"><span class="contact-line-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M7 3h10a1 1 0 0 1 1 1v2h-2V5H8v1H6V4a1 1 0 0 1 1-1Zm-2 5h14l2 5v8H3v-8l2-5Zm1.4 2-1.1 3h13.4l-1.1-3H6.4ZM8 15h8v4H8v-4Z"></path></svg></span><span>0863-2345678</span></a><a class="contact-info-line" href="mailto:info@medicooverseas.com"><span class="contact-line-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M3 5h18v14H3V5Zm1.8 2 7.2 5.2L19.2 7H4.8ZM5 17h14V9.4l-7 5-7-5V17Z"></path></svg></span><span>info@medicooverseas.com</span></a><div class="contact-info-line"><span class="contact-line-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16Zm-1 3h2v5.1l3.6 2.1-1 1.7-4.6-2.8V7Z"></path></svg></span><span>Mon – Sat: 10:00 AM – 7:00 PM</span></div><a class="contact-info-line" href="https://www.google.com/maps/search/?api=1&amp;query=Ashoka+Plaza+Road+No+12+Banjara+Hills+Hyderabad+Telangana+500034" rel="noopener" target="_blank"><span class="contact-line-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 2a5 5 0 0 1 5 5c0 3.2-3.5 8-5 10-1.5-2-5-6.8-5-10a5 5 0 0 1 5-5Zm0 2.5A2.5 2.5 0 1 0 12 11a2.5 2.5 0 0 0 0-2Z"></path></svg></span><span>Hyderabad, Telangana, India</span></a></div>
+</div><div class="copyright copyright-thin"><span class="copyright-copy">© 2026 Medico Overseas. All rights reserved. Fees and university details are indicative and subject to change.</span><span class="legal-links"><a href="#">Privacy Policy</a><i></i><a href="#">Terms &amp; Conditions</a></span></div></div></footer>
+
+<script>
+  lucide.createIcons();
+
+  // Localized pointer tracking script updates every element with class .spotlight-glow-card independently
+  document.addEventListener('pointermove', (e) => {
+    document.querySelectorAll('.spotlight-glow-card').forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      card.style.setProperty('--x', x.toFixed(2));
+      card.style.setProperty('--xp', (x / rect.width).toFixed(2));
+      card.style.setProperty('--y', y.toFixed(2));
+      card.style.setProperty('--yp', (y / rect.height).toFixed(2));
+    });
+  });
+
+  const carouselImages = [
+    { src: "https://media.gettyimages.com/id/1465572741/photo/portrait-of-a-doctor-holding-a-heart-in-his-hands.jpg?s=612x612&w=0&k=20&c=zjg1-v_ii4U4Li-7NCmCqIU6L26zAWBgS2oMEG-O8RY=", alt: "Medical Student", rotation: -14 },
+    { src: "https://media.gettyimages.com/id/1459724421/photo/close-up-of-young-asian-woman-doctors-talking-with-the-patient-about-mental-health-for.jpg?s=612x612&w=0&k=20&c=84jnLsMOEdu04qjdIDfNRGquW7HEeno8ELa6M4CiODw=", alt: "University Campus", rotation: -10 },
+    { src: "https://media.gettyimages.com/id/184328089/photo/heart-stethoscope-and-ekg.jpg?s=612x612&w=0&k=20&c=tupnxdIOukFswpNzVj1mnFZhab625LZ6-poysXnzSAo=", alt: "Lab Training", rotation: -4 },
+    { src: "https://media.gettyimages.com/id/2157680187/photo/futuristic-technology-of-dna-construction-by-ai.jpg?s=612x612&w=0&k=20&c=6D5PzxItNOInMHypaG1eMAIhDZURnpiOh264gvCYyNI=", alt: "Medical Class", rotation: 4 },
+    { src: "https://media.gettyimages.com/id/1500142449/photo/taking-a-listen.jpg?s=612x612&w=0&k=20&c=lG21qPb28UZOmogRs4iHnvWbAxz_yIa2xihlAP01m2o=", alt: "Doctor stethoscope", rotation: 8 },
+    { src: "https://media.gettyimages.com/id/2010746896/photo/medical-training.jpg?s=612x612&w=0&k=20&c=OKS9RMm81KJy5Ui5wxi5q0DrWRObnz-kcSJAB3KsrOQ=", alt: "Medical professionals", rotation: 12 },
+    { src: "https://media.gettyimages.com/id/543351810/photo/your-health-in-our-hands.jpg?s=612x612&w=0&k=20&c=7BH8bzadRsJY6U-doPfgkKlralnCZ38Z9S5G6-1niA0=", alt: "Lab research", rotation: -8 },
+    { src: "https://media.gettyimages.com/id/2210069702/photo/female-nurse-operating-mri-scan-machine-at-mri-scanner-room.jpg?s=612x612&w=0&k=20&c=KP0yu14WoOFnoKm92gENXq6--2BGCKRfIMuiYOa54As=", alt: "Hospital ward", rotation: 15 }
+  ];
+
+  const container = document.getElementById("cards-container");
+  const heroCarousel = document.getElementById("hero-carousel");
+  
+  let angleOffset = 0;
+  const radius = 170;
+
+  function renderCards() {
+    if (!container) return;
+    container.innerHTML = "";
+    const total = carouselImages.length;
+
+    carouselImages.forEach((img, i) => {
+      const angle = (i * (360 / total) + angleOffset) * (Math.PI / 180);
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+
+      const cardDiv = document.createElement("div");
+      cardDiv.className = "absolute w-28 h-36 sm:w-32 sm:h-40 transition-all duration-100 ease-out rounded-2xl overflow-hidden shadow-2xl border border-sky-200/60 group bg-white";
+      cardDiv.style.transform = `translate(${x}px, ${y}px) rotate(${img.rotation}deg)`;
+      cardDiv.style.transformStyle = "preserve-3d";
+
+      cardDiv.innerHTML = `
+        <img src="${img.src}" alt="${img.alt}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-black/20 opacity-30 group-hover:opacity-75 transition-opacity"></div>
+      `;
+
+      container.appendChild(cardDiv);
+    });
+  }
+
+  function animate() {
+    angleOffset += 0.2;
+    renderCards();
+    requestAnimationFrame(animate);
+  }
+
+  if (heroCarousel && container) {
+    heroCarousel.addEventListener("mousemove", (e) => {
+      const rect = heroCarousel.getBoundingClientRect();
+      const xPos = (e.clientX - rect.left) / rect.width - 0.5;
+      const yPos = (e.clientY - rect.top) / rect.height - 0.5;
+      container.style.transform = `rotateX(${-yPos * 18}deg) rotateY(${xPos * 18}deg)`;
+    });
+
+    heroCarousel.addEventListener("mouseleave", () => {
+      container.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
+  }
+
+  animate();
+
+  // Handle callback form submission
+  const callbackForm = document.getElementById('callbackForm');
+  if (callbackForm) {
+    callbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(callbackForm);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const response = await fetch('http://localhost:3001/api/callback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        const messageDiv = document.getElementById('formMessage');
+        
+        if (response.ok) {
+          messageDiv.textContent = '✓ Thank you! We\'ll contact you soon.';
+          messageDiv.style.color = '#10b981';
+          callbackForm.reset();
+        } else {
+          messageDiv.textContent = '✗ Error: ' + (result.message || 'Please try again');
+          messageDiv.style.color = '#ef4444';
+        }
+      } catch (error) {
+        console.error('Form submission error:', error);
+        document.getElementById('formMessage').textContent = '✗ Network error. Please try again.';
+        document.getElementById('formMessage').style.color = '#ef4444';
+      }
+    });
+  }
+</script>
+<script src="assets/site-config.js"></script>
+<script src="assets/script.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const loader = document.getElementById("loader-screen");
+
+  const shouldShow =
+    sessionStorage.getItem("showHeartbeatLoader");
+
+  if (shouldShow !== "true") {
+    loader.classList.add("hide");
+    return;
+  }
+
+  sessionStorage.removeItem("showHeartbeatLoader");
+
+  setTimeout(() => {
+
+    loader.classList.add("hide");
+
+    setTimeout(() => {
+      loader.remove();
+    }, 600);
+
+  }, 2600);
+
+});
+</script>
+</body>
+</html>

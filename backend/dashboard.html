@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medico Overseas - Callback Requests Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-refresh {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-refresh:hover {
+            background: #5568d3;
+        }
+        
+        .btn-export {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-export:hover {
+            background: #059669;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-left: auto;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            position: sticky;
+            top: 0;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .status-new {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-contacted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-small:hover {
+            background: #5568d3;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .info-value {
+            color: #555;
+            word-break: break-word;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer .btn {
+            padding: 10px 20px;
+        }
+        
+        .btn-close {
+            background: #e5e7eb;
+            color: #333;
+        }
+        
+        .btn-close:hover {
+            background: #d1d5db;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Callback Requests Dashboard</h1>
+            <p>Medico Overseas - Student Inquiry Management</p>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-refresh" onclick="loadCallbacks()">🔄 Refresh</button>
+            <button class="btn btn-export" onclick="exportToCSV()">📥 Export CSV</button>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="newCount">0</div>
+                    <div class="stat-label">New</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="contactedCount">0</div>
+                    <div class="stat-label">Contacted</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div id="message" class="message" style="display: none;"></div>
+            
+            <div class="table-wrapper">
+                <table id="callbackTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Country</th>
+                            <th>NEET Score</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: #999;">
+                                Loading callbacks...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p>No callback requests yet</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Request Details</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-close" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        async function loadCallbacks() {
+            showMessage('Loading...', 'loading');
+            try {
+                const response = await fetch(`${API_URL}/callbacks`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderTable(data.callbacks);
+                    updateStats(data.callbacks);
+                    showMessage('', '');
+                } else {
+                    showMessage('Error loading data: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error connecting to backend. Make sure server is running on port 3001', 'error');
+            }
+        }
+        
+        function renderTable(callbacks) {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (callbacks.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tbody.innerHTML = callbacks.map(cb => `
+                <tr>
+                    <td>${cb.id}</td>
+                    <td><strong>${cb.fullName}</strong></td>
+                    <td>${cb.phone}</td>
+                    <td>${cb.email || '-'}</td>
+                    <td>${cb.country}</td>
+                    <td>${cb.neetScore || '-'}</td>
+                    <td>${new Date(cb.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge status-${cb.status}" onclick="changeStatus(${cb.id}, '${cb.status}')">
+                            ${cb.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-small" onclick="viewDetails(${cb.id})">View</button>
+                        <button class="btn-small btn-delete" onclick="deleteCallback(${cb.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateStats(callbacks) {
+            document.getElementById('totalCount').textContent = callbacks.length;
+            document.getElementById('newCount').textContent = callbacks.filter(c => c.status === 'new').length;
+            document.getElementById('contactedCount').textContent = callbacks.filter(c => c.status === 'contacted').length;
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = text ? 'block' : 'none';
+        }
+        
+        async function changeStatus(id, currentStatus) {
+            const statuses = ['new', 'contacted', 'completed', 'rejected'];
+            const nextStatus = statuses[(statuses.indexOf(currentStatus) + 1) % statuses.length];
+            
+            try {
+                const response = await fetch(`${API_URL}/callbacks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+                
+                if (response.ok) {
+                    showMessage('Status updated successfully!', 'success');
+                    setTimeout(() => loadCallbacks(), 1000);
+                }
+            } catch (error) {
+                showMessage('Error updating status', 'error');
+            }
+        }
+        
+        function viewDetails(id) {
+            const tbody = document.getElementById('tableBody');
+            const row = tbody.querySelector(`tr`);
+            // Find the row with this ID
+            let targetRow = null;
+            tbody.querySelectorAll('tr').forEach(r => {
+                if (r.cells[0].textContent == id) {
+                    targetRow = r;
+                }
+            });
+            
+            if (targetRow) {
+                const cells = targetRow.cells;
+                const modal = document.getElementById('detailsModal');
+                const body = document.getElementById('modalBody');
+                
+                body.innerHTML = `
+                    <div class="info-row">
+                        <span class="info-label">ID:</span>
+                        <span class="info-value">${cells[0].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">${cells[1].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value">${cells[2].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">${cells[3].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Country:</span>
+                        <span class="info-value">${cells[4].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">NEET Score:</span>
+                        <span class="info-value">${cells[5].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value">${cells[6].textContent}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">${cells[7].textContent}</span>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('active');
+        }
+        
+        async function deleteCallback(id) {
+            if (confirm('Are you sure you want to delete this request?')) {
+                // Since we don't have a delete endpoint, we'll show a message
+                showMessage('Delete functionality coming soon', 'error');
+            }
+        }
+        
+        function exportToCSV() {
+            const table = document.getElementById('callbackTable');
+            let csv = [];
+            
+            // Get headers
+            const headers = Array.from(table.querySelectorAll('th')).map(h => h.textContent);
+            csv.push(headers.join(','));
+            
+            // Get rows
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td')).map(cell => {
+                    let text = cell.textContent.trim();
+                    // Remove extra spaces and newlines
+                    text = text.replace(/\s+/g, ' ');
+                    // Escape commas and quotes
+                    if (text.includes(',') || text.includes('"')) {
+                        text = '"' + text.replace(/"/g, '""') + '"';
+                    }
+                    return text;
+                });
+                csv.push(cells.join(','));
+            });
+            
+            // Download CSV
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `callbacks-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        // Load callbacks on page load
+        window.addEventListener('load', loadCallbacks);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadCallbacks, 30000);
+    </script>
+</body>
+</html>

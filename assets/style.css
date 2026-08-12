@@ -1,0 +1,62 @@
+
+/* V22: softer footer arrows, compact contact cards, legal links beside copyright */
+.footer .arrow-mark{
+  font-size:16px!important;
+  font-weight:400!important;
+  line-height:1!important;
+  color:#e3eaf4!important;
+  opacity:.92;
+  transform:none!important;
+  margin-right:7px;
+}
+.footer .quick-link{display:flex!important;align-items:center;gap:1px}
+.copyright-thin{
+  justify-content:flex-start!important;
+  gap:12px!important;
+  min-height:28px!important;
+  padding-top:8px!important;
+  margin-top:24px!important;
+}
+.copyright-thin .legal-links{
+  gap:12px!important;
+  margin-left:2px;
+}
+.copyright-thin .legal-links::before{
+  content:"";
+  display:block;
+  width:1px;
+  height:13px;
+  background:rgba(255,255,255,.24);
+  margin-right:1px;
+}
+.copyright-thin .legal-links i{height:12px!important;background:rgba(255,255,255,.24)!important}
+
+.contact-line-list-compact{gap:11px!important;max-width:560px}
+.contact-line-list-compact .contact-line-card{
+  min-height:70px!important;
+  padding:11px 15px!important;
+  gap:14px!important;
+  border-radius:14px!important;
+  box-shadow:0 7px 20px rgba(31,56,100,.035);
+}
+.contact-line-list-compact .contact-line-card:hover{
+  transform:translateY(-1px)!important;
+  box-shadow:0 10px 24px rgba(31,56,100,.07)!important;
+}
+.contact-line-list-compact .contact-icon{
+  flex:0 0 42px!important;
+  width:42px!important;
+  height:42px!important;
+  border-radius:13px!important;
+  font-size:0!important;
+}
+.contact-line-list-compact .contact-icon svg{width:21px;height:21px;fill:currentColor}
+.contact-line-list-compact .contact-line-card strong{font-size:12px!important;letter-spacing:.035em}
+.contact-line-list-compact .contact-line-card em{font-size:15px!important;line-height:1.35!important}
+.contact-line-list-compact .contact-line-card>span:last-child{gap:3px!important}
+@media(max-width:640px){
+  .contact-line-list-compact{max-width:none}
+  .contact-line-list-compact .contact-line-card{min-height:66px!important;padding:10px 13px!important}
+  .copyright-thin{align-items:flex-start!important;gap:7px!important}
+  .copyright-thin .legal-links{margin-left:0}
+}
