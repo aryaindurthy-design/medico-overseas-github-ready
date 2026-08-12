@@ -3,8 +3,8 @@
 <head>
 <script>
 if (
-  localStorage.getItem("medicoLoggedIn") !== "true" &&
-  localStorage.getItem("medicoLoginSkipped") !== "true"
+  sessionStorage.getItem("medicoLoggedIn") !== "true" &&
+  sessionStorage.getItem("medicoLoginSkipped") !== "true"
 ) {
   window.location.replace("login.html");
 }
