@@ -335,13 +335,15 @@
 
         const data = await response.json();
 
-          if (response.ok) {
-     localStorage.setItem("medicoLoggedIn", "true");
-localStorage.setItem("medicoUser", JSON.stringify(data.user));
+         if (response.ok) {
+    localStorage.setItem("medicoLoggedIn", "true");
+    localStorage.setItem("medicoUser", JSON.stringify(data.user));
+    localStorage.setItem("medicoLoginSkipped", "true");
 
-sessionStorage.setItem("showHeartbeatLoader", "true");
+    sessionStorage.setItem("showHeartbeatLoader", "true");
 
-window.location.href = "index.html";
+    window.location.href = "index.html";
+
     } else {
       message.textContent = data.message || "Login failed.";
     }
